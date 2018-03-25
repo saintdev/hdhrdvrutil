@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/ziutek/dvb/ts"
 )
@@ -66,12 +67,52 @@ func (r *RecordingFile) Parse() error {
 		return err
 	}
 
-	if r.EpisodeString != nil {
-		if _, err = fmt.Sscanf(*r.EpisodeString, "S%dE%d", &r.Season, &r.Episode); err != nil {
-			log.Print("Error: Parsing EpisodeString", err)
+	return nil
+}
+
+//This needs a better name
+func (s *RecordingService) ScanRecordingsDir(dir string, recordings []*Recording) error {
+	episodeMap := map[string]*Recording{}
+
+	dir, err := filepath.Abs(dir)
+	if err != nil {
+		return err
+	}
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return err
+	}
+
+	for i := range recordings {
+		episodeMap[*recordings[i].ProgramID] = recordings[i]
+	}
+
+	err = filepath.Walk(dir, func(path string, finfo os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Failed to access path %q: %v\n", dir, err)
 			return err
 		}
-	}
+
+		if finfo.IsDir() && strings.HasPrefix(finfo.Name(), ".") {
+			return filepath.SkipDir
+		}
+
+		if !finfo.IsDir() && filepath.Ext(finfo.Name()) == ".mpg" {
+			log.Println(path)
+			file := &RecordingFile{Filename: &path}
+			if err := file.Parse(); err != nil {
+				return err
+			}
+
+			r, ok := episodeMap[*file.ProgramID]
+			if !ok {
+				return nil
+			}
+			r.Filename = &path
+		}
+
+		return nil
+	})
 
 	return nil
 }

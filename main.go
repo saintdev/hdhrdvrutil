@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
+	"syscall"
 
 	"saintdev/hdhrdvrutil/hdhomerun"
 	"saintdev/hdhrdvrutil/mkvmerge"
@@ -64,32 +66,10 @@ func validateOptions(a *App) {
 }
 
 func main() {
-	var recordingfiles []hdhomerun.RecordingFile
 	var recordings []hdhomerun.Recording
 	a := App{}
 
-	recordingfileidmap := map[string]int{}
-
 	validateOptions(&a)
-
-	files, err := filepath.Glob(filepath.Join(a.srcDir, "*.mpg"))
-	if err != nil {
-		log.Fatalln("Bad glob pattern")
-	}
-
-	for i, filename := range files {
-		r := hdhomerun.RecordingFile{Filename: &filename}
-
-		fmt.Println(r.Filename)
-
-		if err := r.Parse(); err != nil {
-			log.Println("Failed to parse", r.Filename)
-			continue
-		}
-
-		recordingfiles = append(recordingfiles, r)
-		recordingfileidmap[*r.ProgramID] = i
-	}
 
 	hdhomerunClient := hdhomerun.NewClient(nil)
 
@@ -114,26 +94,32 @@ func main() {
 		log.Fatalln("No recordings found!")
 	}
 
-	for _, r := range recordings {
-		i, ok := recordingfileidmap[*r.ProgramID]
-		if !ok {
+	recPtrArr := []*hdhomerun.Recording{}
+	for i := range recordings {
+		recPtrArr = append(recPtrArr, &recordings[i])
+	}
+
+	if err = hdhomerunClient.Recordings.ScanRecordingsDir(a.srcDir, recPtrArr); err != nil {
+		log.Fatalf("Error scanning recordings: %v\n", err)
+	}
+
+	for i := range recordings {
+		r := &recordings[i]
+		if r.Filename == nil {
 			continue
 		}
-		file := &recordingfiles[i]
 
-		file.CmdURL = r.CmdURL
-
-		copyToMkv(file, a.destDir)
+		copyToMkv(r, a.destDir)
 
 		if a.delete {
-			if err = hdhomerunClient.Recordings.Delete((*hdhomerun.Recording)(file), false); err != nil {
-				log.Println("Failed to delete recording:", file.Filename)
+			if err = hdhomerunClient.Recordings.Delete(r, false); err != nil {
+				log.Printf("Failed to delete recording %q: %v\n", r.Filename, err)
 			}
 		}
 	}
 }
 
-func copyToMkv(f *hdhomerun.RecordingFile, destdir string) {
+func copyToMkv(f *hdhomerun.Recording, destdir string) {
 	var filename string
 
 	mkvcmd := mkvmerge.New()
@@ -159,10 +145,15 @@ func copyToMkv(f *hdhomerun.RecordingFile, destdir string) {
 	}
 	mkvcmd.SetTitleTag(*f.Title)
 
-	mkvcmd.Quiet = false
+	mkvcmd.Quiet = true
 
 	if err := mkvcmd.Exec(); err != nil {
-		log.Fatalln("Failed to exec mkvmerge cmd", err)
+		if exitError, ok := err.(*exec.ExitError); ok {
+			waitStatus := exitError.Sys().(syscall.WaitStatus)
+			if waitStatus.ExitStatus() != 1 {
+				log.Fatalf("Failed to exec mkvmerge: %v", err)
+			}
+		}
 	}
 	defer mkvcmd.Close()
 }

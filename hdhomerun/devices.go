@@ -30,6 +30,7 @@ package hdhomerun
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -88,6 +89,16 @@ func (s *DeviceService) RecordedFiles(device *Device) ([]Recording, error) {
 		return nil, err
 	} else if response.StatusCode != http.StatusOK {
 		return nil, errors.New(response.Status)
+	}
+
+	for i := range recordings {
+		r := &recordings[i]
+		if r.EpisodeString != nil {
+			if _, err = fmt.Sscanf(*r.EpisodeString, "S%dE%d", &r.Season, &r.Episode); err != nil {
+				log.Print("Error: Parsing EpisodeString", err)
+				return nil, err
+			}
+		}
 	}
 
 	return recordings, nil
