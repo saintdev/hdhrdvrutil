@@ -98,6 +98,10 @@ func (m *MkvMerge) Exec() error {
 
 	c := exec.Command(command, args...)
 
+	c.Stderr = m.stderr
+	c.Stdin = m.stdin
+	c.Stdout = m.stdout
+
 	log.Println(command, args)
 
 	return c.Run()
