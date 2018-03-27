@@ -52,8 +52,8 @@ type Device struct {
 	StorageURL  *string
 }
 
-func (s *DeviceService) Discover() ([]Device, error) {
-	var devices []Device
+func (s *DeviceService) Discover() ([]*Device, error) {
+	var devices []*Device
 
 	u, _ := url.Parse(defaultBaseURL)
 	u, err := u.Parse("/discover")

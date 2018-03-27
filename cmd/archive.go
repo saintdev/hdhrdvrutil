@@ -86,7 +86,7 @@ func archiveMain(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		recordings, err = dvrClient.Devices.RecordedFiles(&device)
+		recordings, err = dvrClient.Devices.RecordedFiles(device)
 		if err != nil {
 			log.Println("Failed to parse recorded files for device: ", err)
 			continue
