@@ -51,7 +51,8 @@ func init() {
 }
 
 func validateDirs(args []string) {
-	srcDir, err := filepath.Abs(args[0])
+	var err error
+	srcDir, err = filepath.Abs(args[0])
 	if err != nil {
 		log.Fatalf("Unable to construct absolute srcdir path: %v", err)
 	}
