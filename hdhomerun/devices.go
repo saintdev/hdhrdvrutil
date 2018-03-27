@@ -63,7 +63,7 @@ func (s *DeviceService) Discover() ([]*Device, error) {
 
 	_, err = s.client.Get(u, &devices)
 	if err != nil {
-		log.Println("Error parsing discover JSON: ", err)
+		log.Printf("Error parsing discover JSON: %v\n", err)
 		return nil, err
 	}
 
@@ -94,7 +94,7 @@ func (s *DeviceService) RecordedFiles(device *Device) ([]*Recording, error) {
 	for _, r := range recordings {
 		if r.EpisodeString != nil {
 			if _, err = fmt.Sscanf(*r.EpisodeString, "S%dE%d", &r.Season, &r.Episode); err != nil {
-				log.Print("Error: Parsing EpisodeString", err)
+				log.Printf("Error parsing EpisodeString %q: %v\n", *r.EpisodeString, err)
 				return nil, err
 			}
 		}

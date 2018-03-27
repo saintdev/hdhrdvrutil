@@ -41,7 +41,7 @@ func (c *Client) Get(u *url.URL, val interface{}) (*http.Response, error) {
 }
 
 func (c *Client) newRequest(method string, u *url.URL, body interface{}) (*http.Request, error) {
-	log.Println(u)
+	log.Printf("%s\t%s\n", method, u.String())
 
 	var buf io.ReadWriter
 	if body != nil {
@@ -79,12 +79,8 @@ func (c *Client) do(request *http.Request, val interface{}) (*http.Response, err
 		return response, fmt.Errorf("Bad HTTP Response: %v", response.StatusCode)
 	}
 
-	// buf := new(bytes.Buffer)
-	// io.Copy(buf, response.Body)
-	// log.Println(buf.String())
 	if val != nil {
 		err = json.NewDecoder(response.Body).Decode(val)
-		// err = json.NewDecoder(buf).Decode(val)
 	}
 	return response, err
 }

@@ -54,18 +54,18 @@ func validateDirs(args []string) {
 	var err error
 	srcDir, err = filepath.Abs(args[0])
 	if err != nil {
-		log.Fatalf("Unable to construct absolute srcdir path: %v", err)
+		log.Fatalf("Unable to construct absolute srcdir path %q: %v", args[0], err)
 	}
 	if _, err := os.Stat(srcDir); os.IsNotExist(err) {
-		log.Fatalf("Path does not exist: %v", srcDir)
+		log.Fatalf("Path does not exist %q", srcDir)
 	}
 
 	destDir, err = filepath.Abs(args[1])
 	if err != nil {
-		log.Fatalf("Unable to construct absolute destdir path: %v", err)
+		log.Fatalf("Unable to construct absolute destdir path %q: %v", args[1], err)
 	}
 	if _, err := os.Stat(destDir); os.IsNotExist(err) {
-		log.Fatalf("Path does not exist %v", destDir)
+		log.Fatalf("Path does not exist %q", destDir)
 	}
 }
 
@@ -74,11 +74,14 @@ func archiveMain(cmd *cobra.Command, args []string) {
 
 	validateDirs(args)
 
+	log.Printf("Source: %q\n", srcDir)
+	log.Printf("Destination: %q\n", destDir)
+
 	dvrClient := hdhomerun.NewClient(nil)
 
 	devices, err := dvrClient.Devices.Discover()
 	if err != nil {
-		log.Fatalln("Unable to discover devices: ", err)
+		log.Fatalf("Unable to discover devices: %v\n", err)
 	}
 
 	for _, device := range devices {
@@ -88,7 +91,7 @@ func archiveMain(cmd *cobra.Command, args []string) {
 
 		recordings, err = dvrClient.Devices.RecordedFiles(device)
 		if err != nil {
-			log.Println("Failed to parse recorded files for device: ", err)
+			log.Printf("Failed to parse `recorded_files.json` for device at %q: %v\n", *device.BaseURL, err)
 			continue
 		}
 	}
@@ -98,7 +101,7 @@ func archiveMain(cmd *cobra.Command, args []string) {
 	}
 
 	if err = dvrClient.Recordings.ScanRecordingsDir(srcDir, recordings); err != nil {
-		log.Fatalf("Error scanning recordings: %v\n", err)
+		log.Fatalf("Error scanning recordings in %q: %v\n", srcDir, err)
 	}
 
 	for _, r := range recordings {

@@ -37,7 +37,7 @@ type RecordingFile Recording
 func (r *RecordingFile) Parse() error {
 	file, err := os.Open(*r.Filename)
 	if err != nil {
-		log.Print("Error: Unable to open file", r.Filename, err)
+		log.Printf("Error: Unable to open file %q: %v\n", r.Filename, err)
 		return err
 	}
 	defer file.Close()
@@ -50,7 +50,7 @@ func (r *RecordingFile) Parse() error {
 	for i := 0; i < 64; i++ {
 		pkt := ts.AsPkt(buf[:])
 		if err := tsfile.ReadPkt(pkt); err != nil {
-			log.Print("Error: Unable to read TS packet", err)
+			log.Printf("Error: Unable to read TS packet: %v\n", err)
 			continue
 		}
 		if pkt.Pid() != 0x1FFA {
@@ -63,14 +63,14 @@ func (r *RecordingFile) Parse() error {
 	jsonBuf = bytes.Trim(jsonBuf, "\xFF")
 
 	if err = json.Unmarshal(jsonBuf, &r); err != nil {
-		log.Print("Error: Parsing JSON", err)
+		log.Printf("Error parsing TS packet JSON: %v\n", err)
 		return err
 	}
 
 	return nil
 }
 
-//This needs a better name
+//FIXME: This needs a better name
 func (s *RecordingService) ScanRecordingsDir(dir string, recordings []*Recording) error {
 	episodeMap := map[string]*Recording{}
 

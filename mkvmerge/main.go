@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 type MkvMerge struct {
@@ -102,7 +103,7 @@ func (m *MkvMerge) Exec() error {
 	c.Stdin = m.stdin
 	c.Stdout = m.stdout
 
-	log.Println(command, args)
+	log.Printf("%s %s", command, strings.Join(args, " "))
 
 	return c.Run()
 }
