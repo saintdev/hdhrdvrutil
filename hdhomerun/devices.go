@@ -70,8 +70,8 @@ func (s *DeviceService) Discover() ([]Device, error) {
 	return devices, nil
 }
 
-func (s *DeviceService) RecordedFiles(device *Device) ([]Recording, error) {
-	var recordings []Recording
+func (s *DeviceService) RecordedFiles(device *Device) ([]*Recording, error) {
+	var recordings []*Recording
 	if device.IsRecordEngine() == false {
 		return nil, errors.New("Not a RECORD device")
 	}
@@ -91,8 +91,7 @@ func (s *DeviceService) RecordedFiles(device *Device) ([]Recording, error) {
 		return nil, errors.New(response.Status)
 	}
 
-	for i := range recordings {
-		r := &recordings[i]
+	for _, r := range recordings {
 		if r.EpisodeString != nil {
 			if _, err = fmt.Sscanf(*r.EpisodeString, "S%dE%d", &r.Season, &r.Episode); err != nil {
 				log.Print("Error: Parsing EpisodeString", err)

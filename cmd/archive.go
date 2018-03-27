@@ -70,7 +70,7 @@ func validateDirs(args []string) {
 }
 
 func archiveMain(cmd *cobra.Command, args []string) {
-	var recordings []hdhomerun.Recording
+	var recordings []*hdhomerun.Recording
 
 	validateDirs(args)
 
@@ -97,17 +97,11 @@ func archiveMain(cmd *cobra.Command, args []string) {
 		log.Fatalln("No recordings found!")
 	}
 
-	recPtrArr := []*hdhomerun.Recording{}
-	for i := range recordings {
-		recPtrArr = append(recPtrArr, &recordings[i])
-	}
-
-	if err = dvrClient.Recordings.ScanRecordingsDir(srcDir, recPtrArr); err != nil {
+	if err = dvrClient.Recordings.ScanRecordingsDir(srcDir, recordings); err != nil {
 		log.Fatalf("Error scanning recordings: %v\n", err)
 	}
 
-	for i := range recordings {
-		r := &recordings[i]
+	for _, r := range recordings {
 		if r.Filename == nil {
 			continue
 		}
