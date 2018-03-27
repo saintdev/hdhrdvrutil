@@ -98,7 +98,6 @@ func (s *RecordingService) ScanRecordingsDir(dir string, recordings []*Recording
 		}
 
 		if !finfo.IsDir() && filepath.Ext(finfo.Name()) == ".mpg" {
-			log.Println(path)
 			file := &RecordingFile{Filename: &path}
 			if err := file.Parse(); err != nil {
 				return err
