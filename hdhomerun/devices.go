@@ -1,32 +1,19 @@
-package hdhomerun
+// Copyright © 2018 Nathan Caldwell <saintdev@gmail.com>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-/*
-[
-    {
-        "DeviceID": "13105323",
-        "LocalIP": "10.20.20.187",
-        "ConditionalAccess": 1,
-        "BaseURL": "http://10.20.20.187:80",
-        "DiscoverURL": "http://10.20.20.187:80/discover.json",
-        "LineupURL": "http://10.20.20.187:80/lineup.json"
-    },
-    {
-        "DeviceID": "1315F9E1",
-        "LocalIP": "10.20.20.197",
-        "ConditionalAccess": 1,
-        "BaseURL": "http://10.20.20.197:80",
-        "DiscoverURL": "http://10.20.20.197:80/discover.json",
-        "LineupURL": "http://10.20.20.197:80/lineup.json"
-    },
-    {
-        "StorageID": "a7bf100b-e3c1-76bb-47fa-340d3319bc72",
-        "LocalIP": "10.20.20.68:34561",
-        "BaseURL": "http://10.20.20.68:34561",
-        "DiscoverURL": "http://10.20.20.68:34561/discover.json",
-        "StorageURL": "http://10.20.20.68:34561/recorded_files.json"
-    }
-]
-*/
+package hdhomerun
 
 import (
 	"errors"
