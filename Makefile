@@ -1,6 +1,6 @@
 BIN := hdhrdvrutil
 PKG := github.com/saintdev/hdhrdvrutil
-VERSION := $(shell git describe --always --long --dirty)
+VERSION := $(shell git describe --always --long --dirty --tags)
 SRCS := $(shell find . -name '*.go' | grep -v /vendor/)
 
 all: $(BIN)
