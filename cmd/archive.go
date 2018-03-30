@@ -22,9 +22,10 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"saintdev/hdhrdvrutil/hdhomerun"
-	"saintdev/hdhrdvrutil/mkvmerge"
 	"syscall"
+
+	"github.com/saintdev/hdhrdvrutil/hdhomerun"
+	"github.com/saintdev/hdhrdvrutil/mkvmerge"
 
 	"github.com/gosimple/slug"
 	"github.com/spf13/cobra"

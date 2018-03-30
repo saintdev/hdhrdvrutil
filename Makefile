@@ -1,5 +1,5 @@
 BIN := hdhrdvrutil
-PKG := saintdev/hdhrdvrutil
+PKG := github.com/saintdev/hdhrdvrutil
 VERSION := $(shell git describe --always --long --dirty)
 SRCS := $(shell find . -name '*.go' | grep -v /vendor/)
 

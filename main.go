@@ -15,7 +15,7 @@
 
 package main
 
-import "saintdev/hdhrdvrutil/cmd"
+import "github.com/saintdev/hdhrdvrutil/cmd"
 
 func main() {
 	cmd.Execute()
